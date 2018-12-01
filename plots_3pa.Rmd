@@ -1,0 +1,82 @@
+---
+title: "Untitled"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+setwd("/Users/nikhilsharma/Downloads")
+library(readr)
+data <- read_csv("team_stats_with_codes.csv")
+View(data)
+```
+
+```{r}
+sum(is.na(data$`3PA`))
+```
+
+```{r}
+library(dplyr)
+data <- filter(data, Team != "League Average")
+View(data)
+```
+
+```{r}
+eighty <- filter(data, i == 1980)
+View(eighty)
+```
+
+```{r}
+year <- filter (data, i == 1984)
+barplot(year$`3PA`)
+```
+```{r}
+names(data)[34] <- "Three_Pointers_Attempted"
+```
+
+```{r}
+library(ggplot2)
+library(scales)
+library(ggthemes)
+library(gganimate)
+year <- data %>% filter (i == 1984) 
+ggplot(year, aes(x = reorder(Updated_Codes, Three_Pointers_Attempted), y = Three_Pointers_Attempted, fill = reorder(Updated_Codes, Three_Pointers_Attempted))) + 
+  geom_bar(stat="identity", show.legend=FALSE) + 
+  scale_colour_fivethirtyeight() + 
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + 
+  ggtitle("Three Pointers Attempted Per Game", subtitle = "1984") +
+  xlab("Team") +
+  ylab("Three Pointers Attempted")
+```
+
+I realized that putting the 3PA in increasing order doesn't really matter when the graph is so dynamic
+
+
+now, let's animate this through the years
+```{r}
+ggplot(data, aes(x = Updated_Codes , y = Three_Pointers_Attempted, fill = Updated_Codes)) + 
+  geom_bar(stat="identity", show.legend=FALSE) + 
+  scale_colour_fivethirtyeight() + 
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), text = element_text(size=7.5)) + 
+  labs(title = 'Three Pointers Attempted Per Game: {frame_time}', x = 'Team', y = 'Three Pointers Attempted') +
+  transition_time(i) +
+  ease_aes('linear') 
+
+
+
+
+anim_save("threepointers_new.gif")
+```
+
+
+
+
+
+
+
+
+
+
